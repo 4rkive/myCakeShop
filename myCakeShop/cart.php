@@ -1,160 +1,184 @@
-<!--connect file-->
 <?php
-include('include/connect.php');
-include('function/common_function.php');
+include('include/db.php');
+
+if (isset($_GET['remove_success']) && $_GET['remove_success'] == 1) {
+    echo "<script>alert('Product succesfully removed.')</script>";
+    echo "<script>window.location.assign('cart.php')</script>";
+}
+if (isset($_GET['order_success']) && $_GET['order_success'] == 1) {
+    echo "<script>alert('Order placed!')</script>";
+    echo "<script>window.location.assign('cart.php')</script>";
+}
+session_start();
+if (!empty($_SESSION['cart'])) {
+    $printCount = count($_SESSION['cart']);
+}
+else {
+    $printCount = 0;
+}
+if (!empty($_SESSION['user_id']) && !empty($_SESSION['username'])) {
+    $printUsername = $_SESSION['username'];
+}
+else {
+    $printUsername = "None"; 
+}
 ?>
-
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+ 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-Edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sweet 'n Delices-cart details</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-        .cart_img{
-            width: 70px;
-            height: 60px;
-            object-fit: contain;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Cart - Sweet & Delices Cake Shop</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="fonts/circular-std/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/userpage.css">
+    <link rel="stylesheet" href="fonts/fontawesome/css/fontawesome-all.css">
+    <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" type="text/css" href="css/owl.theme.default.min.css">
 </head>
 
 <body>
-    <!--navbar-->
-    <div class="container-fluid p-0">
-        <!--firstchild-->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-              <img src="./IMGs/cakeLogo.png" alt="" class="logo">
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="homepage.php">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="index.php">Explore</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="#">Customization</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="#">About</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="cart.php"><i class="fas fa-shopping-cart"></i><sup><?php cart_item(); ?></sup></a>
-                  </li>
-                </ul>
-              </div>
+    <div class="dashboard-main-wrapper">
+        <?php
+        include("./include/nav.php")
+        ?>
+            <div class="container-fluid dashboard-content">    
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div class="page-header">
+                            <h2 class="pageheader-title">Cart</h2>
+                            <p class="pageheader-text">Proin placerat ante duiullam scelerisque a velit ac porta, fusce sit amet vestibulum mi. Morbi lobortis pulvinar quam.</p>
+                            <div class="page-breadcrumb">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="index.php" class="breadcrumb-link">Home</a></li>
+                                        <li class="breadcrumb-item"><a href="explore.php" class="breadcrumb-link">Explore</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Cart Details</li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mx-5">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    	<div class="card">
+                    		<div class="card-body">
+                    			<div class="table-responsive">
+                    				<table class="table table-bordered">
+                    					<thead>
+                    						<tr>
+                    							<th>No.</th>
+                    							<th>Product Name</th>
+                    							<th>Price</th>
+                    							<th>Quantity</th>
+                    							<th>Total</th>
+                    							<th>Action</th>
+                    						</tr>
+                    					</thead>
+                                        <form method="post" action="insert_orders.php">
+                    					<tbody>
+                    						<?php
+                    						if ($printCount == 0) {
+                    						?>
+                    						<tr>
+                    							<td colspan="6" align="center">Your cart is empty!</td>
+                    						</tr>
+                    						<?php } else { ?>
+                    						<?php
+                                            $total_amount = 0;
+                    						for ($i=0; $i < count($_SESSION['cart']); $i++) { 
+                    							$select = "SELECT * FROM products WHERE product_id = {$_SESSION['cart'][$i]}";
+                    							$query = mysqli_query($con, $select);
+                    							$j = $i;
+                    							while ($res = mysqli_fetch_assoc($query)) { 
+                                                $total_amount = $total_amount + $res['product_price'];
+                    						?>
+                    						<tr>
+                    							<td><?php echo ++$j;?></td>
+                    							<td><?php echo $res['product_name'];?><input type="hidden" name="hidden_product_name[]" value="<?php echo $res['product_name'];?>"></td>
+                    							<td>Php. <?php echo $res['product_price'];?>.00<input type="hidden" name="hidden_product_price[]" value="<?php echo $res['product_price'];?>"></td>
+                    							<td><input class="form-control" type="number" min="1" max="9" step="1" value="1" name="product_quantity[]" onchange="prodTotal(this)"></td>
+                    							<td><span>Php. <?php echo $res['product_price'] * 1;?>.00</span><input type="hidden" name="hidden_product_total[]" value="<?php echo $res['product_price'];?>"></td>
+                    							<td align="center"><a href="remove_product.php?val_i=<?php echo $i;?>"><i class="fas fa-trash-alt"></i></a></td>
+                    						</tr>
+                    					    <?php } ?>
+                    					    <?php } ?>
+                    					    <?php } ?>
+                    					    <tr>
+                    					    	<td colspan="4" align="right">Total Amount:</td>
+                    					    	<td colspan="2" id="total_amount"><span>Php. <?php if ($printCount == 0){echo 0;} else {echo $total_amount;}?>.00</span><input type="hidden" name="hidden_total_amount" value="<?php echo $total_amount;?>"></td>
+                    					    </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    Delivery Date: <input class="form-control" type="date" name="delivery_date" required="">
+                                                </td>
+                                                <td colspan="3">
+                                                    Payment Method: <select class="form-control" name="payment_method">
+                                                        <option>Cash</option>
+                                                        <option>Card</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                    					    <tr>
+                    					    	<td colspan="6" align="right">
+                    					    		<button class="btn btn-warning" onclick="clear_cart()">Clear</button>
+                    					    		<button class="btn btn-primary" type="submit">Checkout</button>
+                    					    	</td>
+                    					    </tr>
+                    					</tbody>
+                    					</form>
+                    				</table>
+                    			</div>
+                    		</div>
+                    	</div>
+                    </div>
+                </div>
+
             </div>
-          </nav>
-
-          <!--calling cart function-->
-          <?php
-          cart();
-          ?>
-
-          <!--secondchild-->
-          <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
-            <div class="container">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100 justify-content-center">
-              <li class="nav-item text-center">
-                <p class="nav-link text-light" href="#">Welcome, Guest!</p>
-              </li>
-            </ul>
-            </div>
-          </nav>
-
-          <!--thirdchild-->
-          <div class="bg-light">
-            <h3 class="text-center fs-5 fw-bold">Hidden Store</h3>
-            <p class="text-center fs-6 fw-light">“If I get reincarnated… I wanna become a clam.”</p>
-          </div>
-
-          <!-- fourt child-table -->
-          <div class="container">
-            <div class="row">
-                <table class="table table-bordered text-center">
-                    <thead>
-                        <tr>
-                            <th>Product Title</th>
-                            <th>Product image</th>
-                            <th>Quantity</th>
-                            <th>Total Price</th>
-                            <th>Remove</th>
-                            <th colspan="2">Operations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <!-- php code to display dynamic data -->
-                            <?php
-                             global $con;
-
-                             $get_ip_add = getIPAddress();
-                             $total_price = 0;
-                             
-                             $cart_query = "SELECT * FROM `cart_details` WHERE ip_address = '$get_ip_add'";
-                             $result = mysqli_query($con, $cart_query);
-                             
-                             while ($row = mysqli_fetch_array($result)) {
-                                 $product_id = $row['product_id'];
-                                 $select_products = "SELECT * FROM `products` WHERE product_id='$product_id'";
-                                 $result_products = mysqli_query($con, $select_products);
-                             
-                                 while ($row_product_price = mysqli_fetch_array($result_products)) {
-                                     $product_price = $row_product_price['product_price']; // Retrieve the product price directly
-                                     $price_table = $row_product_price['product_price'];
-                                     $product_title = $row_product_price['product_title'];
-                                     $product_image1 = $row_product_price['product_image1'];
-                                     $total_price += $product_values; // Add the product price directly to the total
-                             ?>
-                           <tr>
-                            <td><?php echo $product_title?></td>
-                            <td><img src="./IMGs/<?php echo $product_image1?>" alt="" class="cart_img"></td>
-                            <td><input type="text" name=" " id="" class="form-input w=50"></td>
-                            <td><?php echo $price_table?></td> 
-                            <td><input type="checkbox"></td>
-                            <td>
-                               <button class="bg-info px-3 py-2 border-0 mx-3">Update</button>
-                               <button class="bg-info px-3 py-2 border-0 mx-3">Remove</button>
-                           </td>
-                        </tr>
-                    </tr> 
-                    <?php
-                    }
-               }
-                             ?>
-                    </tbody>
-                  </table>
-                  <!-- subtotal -->
-            <div class="d-flex mb-5">
-                 <h4 class="px-3">Subtotal: <strong class="price-info"><?php echo $price_table?></strong></h4>
-                 <a href="index.php"><button class="bg-info px-3 py-2 border-0 mx-3">Continue shopping</button></a>
-                 <a href="#"><button class="bg-secondary p-3 py-2 border-0 text-light">Checkout</button></a>
-            </div>
-        </div>
+            <?php
+            include("./include/footer.php")
+            ?>
     </div>
-    <!-- lastcild --> 
-    <?php
-    include("./include/footer.php")
-    ?>
-</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+    <script src="js/jquery.slimscroll.js"></script>
+    <script src="js/main-js.js"></script>
+    <script type="text/javascript" src="js/owl.carousel.min.js"></script>
+    <script>
+        function add_cart(product_id) {
+                $.ajax({
+                    url:'cart_fetch.php',
+                    data:'id='+product_id,
+                    method:'get',
+                    dataType:'json',
+                    success:function(cart){
+                        console.log(cart);
+                        $('.badge').html(cart.length);
+                    }
+                });
+            }       
+        function prodTotal(quantity) { 
+            var price = $(quantity).parent().prev().find('input').val();
+        	var total = quantity.value * price;
+            $(quantity).parent().next().find('input').val(total);
+            $(quantity).parent().next().find('span').html("Php. "+total);
+            var total_amount = 0;
+            $('input[name="hidden_product_total[]"]').each(function(){
+                total_amount += parseInt($(this).val()); 
+            });
+            $('#total_amount').find('span').html("Php. "+total_amount);
+            $('#total_amount').find('input').val(total_amount);
+        }  
+        function clear_cart() {
+            var flag = confirm("Do you want to clear cart?");
+            if (flag) {
+                window.location.href = "cart_clear.php";
+            }
+        }
+    </script>
 </body>
 </html>

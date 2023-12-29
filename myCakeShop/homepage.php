@@ -1,152 +1,194 @@
-<!--connect file-->
 <?php
-include('include/connect.php');
-include('function/common_function.php');
+include('include/db.php');
+
+if (isset($_GET['login_success']) && $_GET['login_success'] == 1) {
+    echo "<script>alert('User logged in successfully!')</script>";
+    echo "<script>window.location.assign('homepage.php')</script>";
+}
+if (isset($_GET['logout_success']) && $_GET['logout_success'] == 1) {
+    echo "<script>alert('Logged out!')</script>";
+    echo "<script>window.location.assign('index.php')</script>";
+}
+session_start();
+if (!empty($_SESSION['cart'])) {
+    $printCount = count($_SESSION['cart']);
+}
+else {
+    $printCount = 0;
+}
+if (!empty($_SESSION['user_id']) && !empty($_SESSION['username'])) {
+    $printUsername = $_SESSION['username'];
+}
+else {
+    $printUsername = ""; 
+}
 ?>
-
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+ 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-Edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sweet 'n Delices</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Home - Sweet & Delices Cake Shop</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="fonts/circular-std/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/userpage.css">
+    <link rel="stylesheet" href="fonts/fontawesome/css/fontawesome-all.css">
+    <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" type="text/css" href="css/owl.theme.default.min.css">
 </head>
-<body>
-<!--navbar-->
-<div class="container-fluid p-0">
-        <!--firstchild-->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-              <img src="./IMGs/cakeLogo.png" alt="" class="logo">
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="homepage.php">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="index.php">Explore</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Customization</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i><sup>1</sup></a>
-                  </li>
-                </ul>
-                <div class="d-flex justify-content-center">
-                  <div class="d-flex align-items-center">
-                    <a href="users_area/client_login.php" class="btn btn-dark px-3 me-1" data-mdb-ripple-init>Login</a>
-                    <a href="users_area/client_register.php" class="btn btn-dark me-3" data-mdb-ripple-init>Sign up for free</a>
-                    <a href="" class="btn btn-dark px-3 me-1" data-mdb-ripple-init role="button"><i class="fab fa-github"></i></a>
-                  </div>
-                </div>
-                <form class="d-flex" role="search" action="searchProduct.php" method="GET">
-                  <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search" name="search_data">
-                  <input type="submit" value="Search" class="btn btn-outline-dark" name="search_data_product">
-                </form>
-              </div>
-            </div>
-          </nav>
 
-          <!--secondchild-->
-          <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+<body>
+    <div class="dashboard-main-wrapper">
+         <div class="dashboard-header">
+         <?php
+         include("./include/nav.php")?>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
             <div class="container">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100 justify-content-center">
               <li class="nav-item text-center">
-                <p class="nav-link text-light" href="#">Welcome, Guest!</p>
+                <p class="nav-link text-light" href="#">Welcome, <?php echo $printUsername;?>!</p>
               </li>
             </ul>
             </div>
           </nav>
+        
+            <div class="container-fluid dashboard-content">    
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner rounded">
+                                <div class="carousel-item active">
+                                    <img class="d-block w-100" src="uploads/1.jpg" alt="First slide">
+                                    <div class="carousel-caption d-md-block pb-5">
+                                        <h3 class="text-white">GOOD FOOD, GOOD LIFE</h3>
+                                        <p>Cakes are special, every celebration ends with something sweet like a cake and people remember it's all about the memories.</p>
+                                        <a href="about.php" class="btn btn-rounded btn-outline-light">Read More</a>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block w-100" src="uploads/2.jpg" alt="Second slide">
+                                    <div class="carousel-caption d-md-block pb-5">
+                                        <h3 class="text-white">The cake we bake with love</h3>
+                                        <p>Take the shredded pieces of your life and bake a master cake out of it.</p>
+                                        <a href="about.php" class="btn btn-rounded btn-outline-light">Read More</a>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block w-100" src="uploads/3.jpg" alt="Third slide">
+                                    <div class="carousel-caption d-md-block pb-5">
+                                        <h3 class="text-white">Love at first bite</h3>
+                                        <p>You can’t be down when you are holding a cupcake.</p>
+                                        <a href="about.php" class="btn btn-rounded btn-outline-light">Read More</a>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block w-100" src="uploads/5.jpg" alt="Fourth slide">
+                                    <div class="carousel-caption d-md-block pb-5">
+                                        <h3 class="text-white">A party without cake is really just a meeting.</h3>
+                                        <p>Cakes are special, every celebration ends with something sweet like a cake and people remember it's all about the memories.</p>
+                                        <a href="about.php" class="btn btn-rounded btn-outline-light">Read More</a>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block w-100" src="uploads/6.jpg" alt="Fifth slide">
+                                    <div class="carousel-caption d-md-block pb-5">
+                                        <h3 class="text-white">Eat a cake.</h3>
+                                        <p>Cakes are special, every celebration ends with something sweet like a cake and people remember it's all about the memories.</p>
+                                        <a href="about.php" class="btn btn-rounded btn-outline-light">Read More</a>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block w-100" src="uploads/7.jpg" alt="Sixth slide">
+                                    <div class="carousel-caption d-md-block pb-5">
+                                        <h3 class="text-white">View our categories.</h3>
+                                        <p>Cakes are special, every celebration ends with something sweet like a cake and people remember it's all about the memories.</p>
+                                        <a href="about.php" class="btn btn-rounded btn-outline-light">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                                   <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                         <span class="sr-only">Previous</span>   </a>
+                            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                                       <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                   <span class="sr-only">Next</span>  </a>
+                        </div>
+                    </div>
+                </div>
 
-  <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-      <img src="./IMGs/ccake1.1.jpg" class="d-block w-100" alt="...">
-        <div class="container">
-          <div class="carousel-caption text-start">
-            <h1>Example headline.</h1>
-            <p class="opacity-75">Some representative placeholder content for the first slide of the carousel.</p>
-            <p><a class="btn btn-lg btn-primary" href="#">Sign up today</a></p>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-item">
-      <img src="./IMGs/ccake1.2.jpg" class="d-block w-100" alt="...">
-        <div class="container">
-          <div class="carousel-caption text-dark">
-            <h1>Another example headline.</h1>
-            <p>Some representative placeholder content for the second slide of the carousel.</p>
-            <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-item">
-      <img src="./IMGs/ccake1.3.jpg" class="d-block w-100" alt="...">
-        <div class="container">
-          <div class="carousel-caption text-end">
-            <h1>One more for good measure.</h1>
-            <p>Some representative placeholder content for the third slide of this carousel.</p>
-            <p><a class="btn btn-lg btn-primary" href="#">Browse gallery</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
+                <div class="row m-5">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
+                        <h1>Our Features</h1>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12">
+                        <div class="card text-center p-3">
+                            <div class="card-body">
+                                <h1 class="card-title"><i class="fas fa-thumbs-up"></i></h1>
+                                <h3 class="card-title">Quality</h3>
+                                <p class="card-text">Our very first priority is the quality we never compromised in the quality of our bakery products.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12">
+                        <div class="card text-center p-3">
+                            <div class="card-body">
+                                <h1 class="card-title"><i class="fas fa-birthday-cake"></i></h1>
+                                <h3 class="card-title">Fresh & natural</h3>
+                                <p class="card-text">Our every product is fresh and made with natural ingredients we do not use the artificial food ingredient in our products.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12">
+                        <div class="card text-center p-3">
+                            <div class="card-body">
+                                <h1 class="card-title"><i class="fas fa-shipping-fast"></i></h1>
+                                <h3 class="card-title">Free delivery</h3>
+                                <p class="card-text">We provide free delivery to our customers. We deliver in 1 hr from the time customer order the product.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="container marketing">
-    <!-- Three columns of text below the carousel -->
-    <div class="row justify-content-center mt-5">
-      <div class="col-lg-3">
-        <svg class="bd-placeholder-img rounded-circle" width="250" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"/></svg>
-        <h2 class="fw-normal">Heading</h2>
-        <p>Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-      </div>
-      <div class="col-lg-3">
-        <svg class="bd-placeholder-img rounded-circle" width="250" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"/></svg>
-        <h2 class="fw-normal">Heading</h2>
-        <p>Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-      </div>
-      <div class="col-lg-3">
-        <svg class="bd-placeholder-img rounded-circle" width="250" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"/></svg>
-        <h2 class="fw-normal">Heading</h2>
-        <p>Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-      </div>
+                <?php
+                 include("./include/category_card.php")
+                ?>
+
+                <div class="row m-5 hero-image2 rounded">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-3 hero-text">
+                        <h1 class="text-dark">Who We Are</h1>
+                        <p class="text-dark px-5">We are bakers, we bake the piece of joy. We believe cake and baked goods are an expression of love.</p>
+                        <p class="text-dark px-5">We bake from scratch daily using traditional methods and quality ingredients. There are some things in life you just can't fake, and dang good cake? That's one of them. We use organic whole milk, cage-free eggs, loads of real fruit, pure extracts, amazingly delicious chocolate, and lots and lots of real butter to create simply delicious treats the old-fashioned way.</p>
+                        <a href="about.php" class="btn btn-rounded btn-success">Read More</a>
+                    </div>
+                </div>
+
+                <div class="row mx-5 hero-image rounded">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-3 hero-text">
+                        <h1 class="text-white">Always happy to hear from you.</h1>
+                        <a href="contact.php" class="btn btn-rounded btn-brand">Contact Us</a>
+                    </div>
+                </div>
+
+            </div>
+            <?php
+            include("./include/footer.php")
+            ?>
     </div>
-  </div>
-  <!-- lastcild -->
-  <?php
-  include("./include/footer.php")
-  ?>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+    <script src="js/jquery.slimscroll.js"></script>
+    <script src="js/main-js.js"></script>
+    <script type="text/javascript" src="js/owl.carousel.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('.owl-carousel').owlCarousel({
+                loop: true, margin: 10, dots: 0, autoplay: 4000, autoplayHoverPause: true, responsive:{
+                    0:{items:1}, 600:{items:2}, 1000:{items:4}
+                }
+            })
+        });
+    </script>
 </body>
 </html>
